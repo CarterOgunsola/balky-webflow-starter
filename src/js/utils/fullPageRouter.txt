@@ -1,0 +1,68 @@
+import { generalStarter } from "../animations/general/index";
+import { homePageStarter } from "../animations/home/index";
+import { aboutPageStarter } from "../animations/about/index";
+
+// Initializes page-specific animations based on the data-page-name attribute.
+// Ensure the main page wrapper has a unique class with data-page-name attribute
+// to avoid animation code leakage across different pages.
+
+//Usage Exmaple for Hooks Start//
+
+// initPageRouter({
+//     attributeName: 'data-custom-page',    // Custom attribute name
+//     defaultPage: 'home',                  // Fallback to the home page if no attribute is found
+//     onBeforeInit: (pageName) => console.log(`Starting animations for: ${pageName}`),
+//     onAfterInit: (pageName) => console.log(`Finished initializing animations for: ${pageName}`)
+// });
+
+//Usage Exmaple for Hooks End//
+
+export function initPageRouter(config = {}) {
+  const {
+    attributeName = "data-page-name", // Default attribute name
+    defaultPage = null, // Optional default page to fall back to
+    onBeforeInit = null, // Hook before initializing animations
+    onAfterInit = null, // Hook after initializing animations
+  } = config;
+
+  const pageWrapper = document.querySelector(`[${attributeName}]`);
+
+  if (!pageWrapper) {
+    console.warn(`No ${attributeName} attribute found on the page wrapper.`);
+    if (defaultPage && pageStarters[defaultPage]) {
+      console.log(`Falling back to default page: ${defaultPage}`);
+      generalStarter();
+      pageStarters[defaultPage]();
+    }
+    return;
+  }
+
+  const pageName = pageWrapper.getAttribute(attributeName);
+
+  // Hook before initializing animations
+  if (typeof onBeforeInit === "function") {
+    onBeforeInit(pageName);
+  }
+
+  // Initialize general animations first
+  generalStarter();
+
+  // Mapping of page names to their respective starter functions
+  const pageStarters = {
+    home: homePageStarter,
+    about: aboutPageStarter,
+    // Add additional page starters here
+  };
+
+  const starterFunction = pageStarters[pageName];
+  if (starterFunction) {
+    starterFunction();
+  } else {
+    console.warn(`No specific animations found for page: ${pageName}`);
+  }
+
+  // Hook after initializing animations
+  if (typeof onAfterInit === "function") {
+    onAfterInit(pageName);
+  }
+}

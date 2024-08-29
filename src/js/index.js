@@ -1,6 +1,10 @@
-import "../styles/index.css";
-import { showBody } from "./animations/starter";
+// main entry point (e.g., src/js/index.js)
 
-showBody();
+import "../styles/index.css";
+import { initPageRouter } from "./utils/pageRouter";
+
+document.addEventListener("DOMContentLoaded", () => {
+  initPageRouter();
+});
 
 console.log("Hello, Vite!");
